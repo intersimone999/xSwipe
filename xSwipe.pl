@@ -303,8 +303,9 @@ while(my $line = <INFILE>){
         if( abs($time - $eventTime) > 0.2 ){
             ### $time - $eventTime got: $time - $eventTime
             $eventTime = $time;
-            PressKey $_ foreach(@eventString);
-            ReleaseKey $_ foreach(reverse @eventString);
+            #PressKey $_ foreach(@eventString);
+            #ReleaseKey $_ foreach(reverse @eventString);
+	    SendKeys(@eventString);
             ### @eventString
         }# if enough time has passed
         @eventString = ("default");
