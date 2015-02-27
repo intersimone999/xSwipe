@@ -1,31 +1,37 @@
-xSwipe
+xSwipe - Ubuntu 14.04
 ======================
 xSwipe is multitouch gesture recognizer.
-This script make your linux PC able to recognize swipes like a Macbook.
+This script make your Ubuntu 14.04 PC able to recognize swipes like a Macbook.
 
 ## Usage
 
 Before running the script, you must first do some preparations.
 
-  1. Download xSwipe
-  2. Install X11::GUITest
-  3. Enable SHMConfig
+  1. Install git
+  2. Download xSwipe
+  3. Install X11::GUITest
+  4. Enable SHMConfig
+  5. Install xserver-xorg-input-synaptic
 
-### 1. Download xSwipe
+### 1. Install git
+Type below code to download git:
+
+    $ sudo apt-get install git
+
+### 2. Download xSwipe
 Type below code, download xSwipe from github
 
-    $ cd ~
-    $ wget https://github.com/iberianpig/xSwipe/archive/master.zip
-    $ unzip master.zip
+    $ cd YourInstallationFolder
+    $ git clone https://github.com/intersimone999/xSwipe.git
 
-### 2. Install X11::GUITest
+### 3. Install X11::GUITest
 
 To install libx11-guitest-perl from synaptic package manager
 Or run the script on the terminal run as
 
     $ sudo apt-get install libx11-guitest-perl
 
-### 3. Enable SHMConfig
+### 4. Enable SHMConfig
 
 Open /etc/X11/xorg.conf.d/50-synaptics.conf with your favorite text editor and edit it to enable SHMConfig
 
@@ -45,17 +51,46 @@ Open /etc/X11/xorg.conf.d/50-synaptics.conf with your favorite text editor and e
     Option "SHMConfig" "on"
     EndSection
 
-To reflect SHMConfig, restart your session.
 
-That's it for preparation.
+### 5. Enable SHMConfig
+First, uninstall the package xserver-xorg-input-synaptic:
 
+    $ sudo apt-get remove xserver-xorg-input-synaptic
+  
+Download in a temporary folder this version of the package:
+
+    $ git clone https://github.com/felipejfc/xserver-xorg-input-synaptics TempFolder
+    $ cd TempFolder
+
+Install the following packages in order to compile the previously downloaded package:
+
+    $ sudo apt-get install xutils-dev xorg-dev mtdev-tools libevdev2 libevdev-dev libtool
+
+Run the following commands in order to compile and install the package and to remove the temporary folder previously created.
+
+    $ ./autogen.sh
+    $ ./configure --exec_prefix=/usr
+    $ make
+    $ sudo make install
+    $ cd ..
+    $ rm -r TempFolder
+
+Restart your session. That's it for the preparation.
+
+**NOTE**: If something went wrong, your touchpad won't work! To let it work again, run:
+
+    $ sudo apt-get install xserver-xorg-input-synaptic
+
+and restart your session.
+  
 ## Run xSwipe
 
 To run xSwipe, type below code on terminal.
 
-    $ perl ~/xSwipe-master/xSwipe.pl
+    $ perl ~/xSwipe-master/xSwipe.pl -n
 
 **Note:You should run xSwipe.pl in same directory as "eventKey.cfg" .**
+**Note:Always use the "-n" option, because this version of the project supports only natural scroll**
 
 You can use "swipe" with 3 or 4 fingers, they can call an event.
 Additionally, some gestures are avilable.
@@ -95,5 +130,3 @@ Please check this article, ["How to customize gesture"](https://github.com/iberi
 * open launcher (Alt+F8)
 * open a terminal (Ctrl+Alt+t)
 * close a window (Alt+F4)
-
-Please let me know if you have any questions about this program.
