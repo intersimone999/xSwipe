@@ -52,7 +52,7 @@ Open /etc/X11/xorg.conf.d/50-synaptics.conf with your favorite text editor and e
     EndSection
 
 
-### 5. Enable SHMConfig
+### 5. Install xserver-xorg-input-synaptic
 First, uninstall the package xserver-xorg-input-synaptic:
 
     $ sudo apt-get remove xserver-xorg-input-synaptic
