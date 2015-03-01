@@ -14,7 +14,7 @@ use FindBin;
 #debug
 #use Smart::Comments;
 
-my $naturalScroll = 0;
+my $naturalScroll = 1;
 my $baseDist = 0.1;
 my $pollingInterval = 10;
 my $confFileName = "eventKey.cfg";
@@ -23,6 +23,7 @@ my $nScrollConfFileName = "nScroll/eventKey.cfg";
 while(my $ARGV = shift){
     ### $ARGV
     if ($ARGV eq '-n'){
+		print "Deprecated -n option. The script is working, but you don't have to add that option, it's always on."
         $naturalScroll = 1;
     }elsif ($ARGV eq '-d'){
         if ($ARGV[0] > 0){
@@ -52,7 +53,7 @@ while(my $ARGV = shift){
             INTERVAL how often synclient monitor changes to the touchpad state
             INTERVAL > 0, default value is 10 (ms)
         -n
-            Natural Scrolling, like a macbook
+            Natural Scrolling, like a macbook (DEPRECATED, it's always ON)
             setting file path=nScroll/eventKey.cfg
         \n";
         exit(1);
