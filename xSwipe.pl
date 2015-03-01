@@ -103,14 +103,10 @@ my $innerEdgeBottom = $BottomEdge - $yMinThreshold;
 #load config
 my $script_dir = $FindBin::Bin;#CurrentPath
 my $conf = require $script_dir."/".$confFileName;
-open (fileHundle, "pgrep -lf ^gnome-session |")or die "can't pgrep -lf ^gnome-session";
-my @data = <fileHundle>;
-my $sessionName = (split "session=", $data[0])[1];
-close(fileHundle);
-chomp($sessionName);
-$sessionName = ("$sessionName" ~~ $conf) ? "$sessionName" : 'other';
-### $sessionName
+my $sessionName = 'session';
+my $repetitionName = 'repetition';
 
+### Loads the combinations for each gesture
 my @swipe3Right = split "/", ($conf->{$sessionName}->{swipe3}->{right});
 my @swipe3Left  = split "/", ($conf->{$sessionName}->{swipe3}->{left});
 my @swipe3Down  = split "/", ($conf->{$sessionName}->{swipe3}->{down});
@@ -126,6 +122,8 @@ my @swipe5Left  = split "/", ($conf->{$sessionName}->{swipe5}->{left});
 my @swipe5Down  = split "/", ($conf->{$sessionName}->{swipe5}->{down});
 my @swipe5Up    = split "/", ($conf->{$sessionName}->{swipe5}->{up});
 
+my @edgeSwipe1Right = split "/", ($conf->{$sessionName}->{edgeSwipe1}->{right});
+my @edgeSwipe1Left  = split "/", ($conf->{$sessionName}->{edgeSwipe1}->{left});
 my @edgeSwipe2Right = split "/", ($conf->{$sessionName}->{edgeSwipe2}->{right});
 my @edgeSwipe2Left  = split "/", ($conf->{$sessionName}->{edgeSwipe2}->{left});
 my @edgeSwipe3Down  = split "/", ($conf->{$sessionName}->{edgeSwipe3}->{down});
@@ -136,6 +134,8 @@ my @longPress2 = split "/", ($conf->{$sessionName}->{swipe2}->{press});
 my @longPress3 = split "/", ($conf->{$sessionName}->{swipe3}->{press});
 my @longPress4 = split "/", ($conf->{$sessionName}->{swipe4}->{press});
 my @longPress5 = split "/", ($conf->{$sessionName}->{swipe5}->{press});
+my $moveCombo = $conf->{move}->{key};
+my $moveFingers = $conf->{move}->{fingers};
 
 my @xHist1 = ();                # x coordinate history (1 finger)
 my @yHist1 = ();                # y coordinate history (1 finger)
@@ -156,12 +156,20 @@ my $eventTime = 0;              # ensure enough time has passed between events
 my @eventString = ("default");  # the event to execute
 
 my $currWind = GetInputFocus();
+my $oneTimeCombination = 0;     # one time combination (for those combinations which need single press) is disabled
+my $movingWindow = 0;
+
+my $onetime = 0;
+my $move = 0;
+my $mouseRelX = 0;
+my $mouseRelY = 0;
+
 die "couldn't get input window" unless $currWind;
 open(INFILE,"synclient -m $pollingInterval |") or die "can't read from synclient";
 
 while(my $line = <INFILE>){
     chomp($line);
-    my($time, $x, $y, $z, $f, $w) = split " ", $line;
+    my($time, $x, $y, $z, $f, $w, $click) = split " ", $line;
     next if($time =~ /time/); #ignore header lines
     if($time - $lastTime > 5){
         &initSynclient($naturalScroll);
@@ -173,8 +181,7 @@ while(my $line = <INFILE>){
         if($touchState == 0){
             if(($x < $innerEdgeLeft)or($innerEdgeRight < $x)){
                 $touchState = 2;
-                &switchTouchPad("Off");
-            }else{
+	    } else {
                 $touchState = 1;
             }
         }
@@ -286,30 +293,74 @@ while(my $line = <INFILE>){
         cleanHist(1, 2, 3, 4, 5);
         if($touchState > 0){
             $touchState = 0; #touchState Reset
-            &switchTouchPad("On");
+            #&switchTouchPad("On");
         }
+		$oneTimeCombination = 0;
     }
 
 
-#detect action
+#detect actiononetime
     if ($axis ne 0){
-        @eventString = setEventString($f,$axis,$rate,$touchState);
+        @eventString = setEventString($f,$axis,$rate,$touchState,$click);
         cleanHist(1, 2, 3, 4, 5);
     }
 
-# only process one event per time window
-    if( $eventString[0] ne "default" ){
-        ### ne default
-        if( abs($time - $eventTime) > 0.2 ){
-            ### $time - $eventTime got: $time - $eventTime
-            $eventTime = $time;
-            #PressKey $_ foreach(@eventString);
-            #ReleaseKey $_ foreach(reverse @eventString);
-	    SendKeys(@eventString);
-            ### @eventString
-        }# if enough time has passed
-        @eventString = ("default");
-    }#if non default event
+	$onetime = 0;
+	if (scalar(@eventString) > 1) {
+		if ($eventString[1] == 'onetime') {
+			$onetime = 1;
+		}
+	}
+
+# click events
+#	if ($click eq "1") {
+#		if (($f eq $moveFingers) and ($movingWindow ne 1)) {
+#			$movingWindow = 1;
+#		}
+#	} elsif ($movingWindow eq 1) {
+#		if ($f ne $moveFingers) {
+#			$movingWindow = 0;
+#		} else {
+#			PressKey("LAL");
+#			PressMouseButton(M_LEFT);
+#			$movingWindow = 2;
+#		}
+#	} elsif ($movingWindow eq 2) {
+#		if ($f eq 0) {
+#			$movingWindow = 0;
+#			ReleaseMouseButton(M_LEFT);
+#			ReleaseKey("LAL");
+#		}
+#	}
+
+	if ($f eq $moveFingers) {
+		PressKey("LAL");
+		PressMouseButton(M_LEFT);
+		$movingWindow = 1;
+	} elsif ($movingWindow eq 1 and $f eq 0) {
+		$movingWindow = 0;
+		ReleaseMouseButton(M_LEFT);
+		ReleaseKey("LAL");
+	}
+
+# standard swipe events
+	if ($movingWindow ne 1) {
+		if($oneTimeCombination ne 1) {
+			if($onetime) {
+				$oneTimeCombination = 1;
+			}
+			if( $eventString[0] ne "default"){
+				### ne default
+				if( abs($time - $eventTime) > 0.2 ){
+				    ### $time - $eventTime got: $time - $eventTime
+				    $eventTime = $time;
+					SendKeys($eventString[0]);
+				    ### @eventString
+				}# if enough time has passed
+				@eventString = ("default");
+			}#if non default event
+		}
+	}
 }#synclient line in
 close(INFILE);
 
@@ -326,25 +377,25 @@ sub initSynclient{
     }
 }
 
-sub switchTouchPad{
-    open(TOUCHPADOFF,"synclient -l | grep TouchpadOff |") or die "can't read from synclient";
-    my $TouchpadOff = <TOUCHPADOFF>;
-    close(TOUCHPADOFF);
-    chomp($TouchpadOff);
-    my $TouchpadOff = (split "= ", $TouchpadOff)[1];
-    ### $TouchpadOff
-    my $switch_flag = shift;
-    ### $switch_flag
-    if($switch_flag eq 'Off'){
-        if($TouchpadOff eq '0'){
-            `synclient TouchpadOff=1`;
-        }
-    }elsif($switch_flag eq 'On'){
-        if($TouchpadOff ne '0' ){
-            `synclient TouchpadOff=0`;
-        }
-    }
-}
+#sub switchTouchPad{
+#    open(TOUCHPADOFF,"synclient -l | grep TouchpadOff |") or die "can't read from synclient";
+#    my $TouchpadOff = <TOUCHPADOFF>;
+#    close(TOUCHPADOFF);
+#    chomp($TouchpadOff);
+#    my $TouchpadOff = (split "= ", $TouchpadOff)[1];
+#    ### $TouchpadOff
+#    my $switch_flag = shift;
+#    ### $switch_flag
+#    if($switch_flag eq 'Off'){
+#        if($TouchpadOff eq '0'){
+#            `synclient TouchpadOff=1`;
+#        }
+#    }elsif($switch_flag eq 'On'){
+#        if($TouchpadOff ne '0' ){
+#            `synclient TouchpadOff=0`;
+#        }
+#    }
+#}
 
 
 
@@ -409,8 +460,20 @@ sub cleanHist{
 
 #return @eventString $_[0]
 sub setEventString{
-    my($f, $axis, $rate, $touchState)=@_;
-    if($f == 2){
+    my($f, $axis, $rate, $touchState, $click)=@_;
+    if($f == 1){
+	if($axis eq "x"){
+            if($rate eq "+"){
+                if($touchState eq "2"){
+                    return @edgeSwipe1Right;
+                }
+            }elsif($rate eq "-"){
+                if($touchState eq "2"){
+                    return @edgeSwipe1Left;
+                }
+            }
+        }
+    }elsif($f == 2){
         if($axis eq "x"){
             if($rate eq "+"){
                 if($touchState eq "2"){
@@ -428,6 +491,10 @@ sub setEventString{
                 }
             }
         }
+
+		if($click eq "1") {
+			return @longPress2;
+		}
     }elsif($f == 3){
         if($axis eq "x"){
             if($rate eq "+"){
@@ -452,6 +519,10 @@ sub setEventString{
                 return @longPress3;
             }
         }
+
+		if($click eq "1") {
+			return @longPress3;
+		}
     }elsif($f == 4){
         if($axis eq "x"){
             if($rate eq "+"){
@@ -476,6 +547,10 @@ sub setEventString{
                 return @longPress4;
             }
         }
+
+		if($click eq "1") {
+			return @longPress4;
+		}
     }elsif($f == 5){
         if($axis eq "x"){
             if($rate eq "+"){
@@ -494,6 +569,10 @@ sub setEventString{
                 return @longPress5;
             }
         }
+
+		if($click eq "1") {
+			return @longPress4;
+		}
     }
     return "default";
 }
