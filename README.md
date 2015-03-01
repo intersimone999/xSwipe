@@ -107,26 +107,113 @@ Additionally, some gestures are avilable.
       *INTERVAL* is how often synclient monitor changes to the touchpad state.
       Default value is 10(ms).
       Set 50ms as monitoring-span. (e.g.,`$ perl xSwipe.pl -m 50`)
-*   `-n` :
-      Natural scroll like Macbook, use "/nScroll/eventKey.cfg".
-
-## Customize
-You can customize the settings for gestues to edit eventKey.cfg.
-Please check this article, ["How to customize gesture"](https://github.com/iberianpig/xSwipe/wiki/Customize-eventKey.cfg).
 
 ### Bindable gestures
 * 3/4/5 fingers swipe
 * 2/3/4/5 fingers long-press
 * 2/3/4 fingers edge-swipe
     - *2fingers edge-swipe*: only swipe-left/right from right/left edge
-    - *3fingers edge-swipe*: only swipe-down from top egde
+    - *3/4/5fingers edge-swipe*: only swipe-down from top egde
 
-### Example shortcut keys
-* go back/forward on browser (Alt+Left, Alt+Right)
-* open/close a tab on browser (Ctrl+t/Ctrl+w)
-* move tabs (Ctrl+Tab, Ctrl+Shift+Tab)
-* move workspaces (Alt+Ctrl+Lert, Alt+Ctrl+Right, Alt+Ctrl+Up, Alt+Ctrl+Down)
-* move a window (Alt+F7)
-* open launcher (Alt+F8)
-* open a terminal (Ctrl+Alt+t)
-* close a window (Alt+F4)
+### Coming soon
+* Move gesture
+* 1 finger edge-swipe
+* Pinch gestures
+
+### Default gestures
+
+* 2 Fingers
+  * Left (edge) -> Lower volume (Special key)
+  * Right (edge) -> Raise volume (Special key)
+* 3 Fingers
+  * Up -> To lower desktop (Ctrl+Alt+Down)
+  * Down -> To upper desktop (Ctrl+Alt+Up)
+  * Left -> History forward (Alt+Right)
+  * Right -> History back (Alt+Left)
+* 4 Fingers
+  * Up -> Show all windows on desktop (Edited compiz combination: Ctrl+Alt+w)
+  * Down -> Show all windows in the system (Edited compiz combination: Ctrl+Alt+Shift+w)
+  * Left -> Previous song (Special key)
+  * Right -> Next song (Special key)
+* 5 Fingers
+  * Up -> Move window to lower desktop (Ctrl+Alt+Shift+Down)
+  * Down -> Move window to upper desktop (Ctrl+Alt+Shift+Up)
+
+# Configuration file customization
+
+In order to change the action of a gesture, find the gesture in "eventKey.cfg" and set the corresponding double-quoted string. You can use the following modifiers:
+
+    ^       CTRL
+    %       ALT
+    +       SHIFT
+    #       META
+    &       ALTGR
+    ~       ENTER
+    \n      ENTER
+    \t      TAB
+    ( and ) MODIFIER GROUPING (eg: "^(c)" is CTRL+C; "^(%(l))" is CTRL+ALT+L)
+    { and } QUOTE / ESCAPE CHARACTERS (eg: "{LSK}" is Left "Super" key; {UP} is Up key.)
+
+
+These are all the special keys:
+
+      Name    Action
+    -------------------
+    BAC     BackSpace
+    BS      BackSpace
+    BKS     BackSpace
+    BRE     Break
+    CAN     Cancel
+    CAP     Caps_Lock
+    DEL     Delete
+    DOWN    Down
+    END     End
+    ENT     Return
+    ESC     Escape
+    F1      F1
+    ...     ...
+    F12     F12
+    HEL     Help
+    HOM     Home
+    INS     Insert
+    LAL     Alt_L
+    LMA     Meta_L
+    LCT     Control_L
+    LEF     Left
+    LSH     Shift_L
+    LSK     Super_L
+    MNU     Menu
+    NUM     Num_Lock
+    PGD     Page_Down
+    PGU     Page_Up
+    PRT     Print
+    RAL     Alt_R
+    RMA     Meta_R
+    RCT     Control_R
+    RIG     Right
+    RSH     Shift_R
+    RSK     Super_R
+    SCR     Scroll_Lock
+    SPA     Space
+    SPC     Space
+    TAB     Tab
+    UP      Up
+
+To find special keys, use xev.
+For example: 
+
+    'session'=>{
+      [...]
+      swipe3=>{
+        [...]
+        left    =>  "%({RIG})", #Triggered if there is a 3-fingers swipe towards left
+        [...]
+      }
+      [...]
+      edgeSwipe2=>{
+        [...]
+        right	=>   "{LSK}", #Triggered if there is a 1-finger swipe from the left edge towards right
+        [...]
+      },
+      [...]
+    },
