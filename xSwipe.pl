@@ -108,7 +108,7 @@ my @data = <fileHundle>;
 my $sessionName = (split "session=", $data[0])[1];
 close(fileHundle);
 chomp($sessionName);
-$sessionName = ("$sessionName" ~~ $conf) ? "$sessionName" : 'other';
+$sessionName = 'session';
 ### $sessionName
 
 my @swipe3Right = split "/", ($conf->{$sessionName}->{swipe3}->{right});
@@ -301,11 +301,8 @@ while(my $line = <INFILE>){
     if( $eventString[0] ne "default" ){
         ### ne default
         if( abs($time - $eventTime) > 0.2 ){
-            ### $time - $eventTime got: $time - $eventTime
             $eventTime = $time;
-            #PressKey $_ foreach(@eventString);
-            #ReleaseKey $_ foreach(reverse @eventString);
-	    SendKeys(@eventString);
+	    	SendKeys($eventString[0]);
             ### @eventString
         }# if enough time has passed
         @eventString = ("default");
