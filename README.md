@@ -87,7 +87,7 @@ and restart your session.
 
 To run xSwipe, type below code on terminal.
 
-    $ perl ~/xSwipe-master/xSwipe.pl -n
+    $ perl ~/xSwipe-master/xSwipe.pl
 
 **Note:You should run xSwipe.pl in same directory as "eventKey.cfg" .**
 **Note:Always use the "-n" option, because this version of the project supports only natural scroll**
