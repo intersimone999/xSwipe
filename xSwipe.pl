@@ -1,12 +1,11 @@
 #!/usr/bin/perl
-################################################
- #	#   ####   #	#	 #	#####   ######
-  #  #   #	   #	#	 #	#	#  #
-   ##	 ####   #	#	 #	#	#  #####
-   ##		 #  # ## #	 #	#####   #
-  #  #   #	#  ##  ##	 #	#	   #
- #	#   ####   #	#	 #	#	   ######
-################################################
+######################################################################
+#   #      #  #   #          #####  #           #   #  ####   #####  #
+#   #      #   # #          #        #   # #   #    #  #   #  #      #
+#   #      #    #     ###    ####     #   #   #     #  ####   ###    #
+#    #    #    # #               #     # # # #      #  #      #      #
+#      ##     #   #         #####       #   #       #  #      #####  #
+######################################################################
 use strict;
 use Time::HiRes();
 use X11::GUITest qw( :ALL );
@@ -23,7 +22,7 @@ while(my $ARGV = shift){
 	### $ARGV
 	if ($ARGV eq '-n'){
 		$naturalScroll = 1;
-		print("Deprecated -n option");
+		print("Deprecated -n option. Running anyway...\n");
 	}elsif ($ARGV eq '-d'){
 		if ($ARGV[0] > 0){
 			$baseDist = $baseDist * $ARGV[0];
@@ -81,7 +80,6 @@ my $BottomEdge = (split "= ", $area_setting[3])[1];
 
 my $TouchpadSizeH = abs($TopEdge - $BottomEdge);
 my $TouchpadSizeW = abs($LeftEdge - $RightEdge);
-my $centerTouchPad = 3000;
 # todo:タッチパッドの比率^2でMinThresholdを決定してもいいかも
 my $xMinThreshold = $TouchpadSizeW * $baseDist;
 my $yMinThreshold = $TouchpadSizeH * $baseDist;
@@ -130,42 +128,45 @@ my @edgeSwipe1Left  = split "/", ($conf->{$swipeName}->{edgeSwipe1}->{left});
 my @edgeSwipe2Right = split "/", ($conf->{$swipeName}->{edgeSwipe2}->{right});
 my @edgeSwipe2Left  = split "/", ($conf->{$swipeName}->{edgeSwipe2}->{left});
 my @edgeSwipe3Down  = split "/", ($conf->{$swipeName}->{edgeSwipe3}->{down});
-my @edgeSwipe3Up	= split "/", ($conf->{$swipeName}->{edgeSwipe3}->{up});
+my @edgeSwipe3Up    = split "/", ($conf->{$swipeName}->{edgeSwipe3}->{up});
 my @edgeSwipe4Down  = split "/", ($conf->{$swipeName}->{edgeSwipe4}->{down});
-my @edgeSwipe4Up	= split "/", ($conf->{$swipeName}->{edgeSwipe4}->{up});
-my @longPress2 = split "/", ($conf->{$swipeName}->{swipe2}->{press});
-my @longPress3 = split "/", ($conf->{$swipeName}->{swipe3}->{press});
-my @longPress4 = split "/", ($conf->{$swipeName}->{swipe4}->{press});
-my @longPress5 = split "/", ($conf->{$swipeName}->{swipe5}->{press});
+my @edgeSwipe4Up    = split "/", ($conf->{$swipeName}->{edgeSwipe4}->{up});
+my @longPress2      = split "/", ($conf->{$swipeName}->{swipe2}->{press});
+my @longPress3      = split "/", ($conf->{$swipeName}->{swipe3}->{press});
+my @longPress4      = split "/", ($conf->{$swipeName}->{swipe4}->{press});
+my @longPress5      = split "/", ($conf->{$swipeName}->{swipe5}->{press});
 
 #Move gestures
 my $moveCombo = $conf->{$moveName}->{key};
 my $moveFingers = $conf->{$moveName}->{fingers};
+my @swipe3UpMoving = $conf->{$moveName}->{swipe}->{up};
+my @swipe3DownMoving = $conf->{$moveName}->{swipe}->{down};
 
 #Pinch gestures
 my @pinchIn = split "/", ($conf->{$pinchName}->{in});
 my @pinchOut = split "/", ($conf->{$pinchName}->{out});
-my $openSt		= 1000;	# start of open pinch
-my $openEn		= 500;	 # end of open pinch
-my $closeSt		= 1000;	# start of close pinch
-my $closeEn		= 1000;	# end of close pinch
+my $openSt  = 1000; # start of open pinch
+my $openEn  = 500;  # end of open pinch
+my $closeSt = 1000; # start of close pinch
+my $closeEn = 1000; # end of close pinch
 
-my @xHist1 = ();				# x coordinate history (1 finger)
-my @yHist1 = ();				# y coordinate history (1 finger)
-my @xHist2 = ();				# x coordinate history (2 fingers)
-my @yHist2 = ();				# y coordinate history (2 fingers)
-my @xHist3 = ();				# x coordinate history (3 fingers)
-my @yHist3 = ();				# y coordinate history (3 fingers)
-my @xHist4 = ();				# x coordinate history (4 fingers)
-my @yHist4 = ();				# y coordinate history (4 fingers)
-my @xHist5 = ();				# x coordinate history (5 fingers)
-my @yHist5 = ();				# y coordinate history (5 fingers)
+my @xHist1 = ();  # x coordinate history (1 finger)
+my @yHist1 = ();  # y coordinate history (1 finger)
+my @xHist2 = ();  # x coordinate history (2 fingers)
+my @yHist2 = ();  # y coordinate history (2 fingers)
+my @xHist3 = ();  # x coordinate history (3 fingers)
+my @yHist3 = ();  # y coordinate history (3 fingers)
+my @xHist4 = ();  # x coordinate history (4 fingers)
+my @yHist4 = ();  # y coordinate history (4 fingers)
+my @xHist5 = ();  # x coordinate history (5 fingers)
+my @yHist5 = ();  # y coordinate history (5 fingers)
 
 my $axis = 0;
 my $rate = 0;
-my $touchState = 0;			 # touchState={0/1/2} 0=notSwiping, 1=Swiping, 2=edgeSwiping
-my $lastTime = 0;			   # time monitor for TouchPad event reset
-my $eventTime = 0;			  # ensure enough time has passed between events
+my $speed = 0;
+my $touchState = 0; # touchState={0/1/2} 0=notSwiping, 1=Swiping, 2=edgeSwiping
+my $lastTime = 0;   # time monitor for TouchPad event reset
+my $eventTime = 0;  # ensure enough time has passed between events
 my @eventString = ("default");  # the event to execute
 
 my $currWind = GetInputFocus();
@@ -188,6 +189,7 @@ while(my $line = <INFILE>){
 		&initSynclient($naturalScroll);
 	}#if time reset
 	$lastTime = $time;
+	$speed = 0;
 	$axis = 0;
 	$rate = 0;
 	if($f == 1){
@@ -314,7 +316,11 @@ while(my $line = <INFILE>){
 
 	#detect actiononetime
 	if ($axis ne 0){
-		@eventString = setEventString($f,$axis,$rate,$touchState,$click);
+		if ($movingWindow ne 1) {
+			@eventString = setEventString($f,$axis,$rate,$touchState,$click,$speed);
+		} else {
+			@eventString = setEventStringMoving($f,$axis,$rate,$touchState,$click,$speed);
+		}
 		cleanHist(1, 2, 3, 4, 5);
 	}
 
@@ -337,23 +343,23 @@ while(my $line = <INFILE>){
 	}
 
 	# swipe/pinch events
-	if ($movingWindow ne 1) {
-		if($oneTimeCombination ne 1) {
-			if($onetime) {
-				$oneTimeCombination = 1;
-			}
-			if( $eventString[0] ne "default"){
-				### ne default
-				if( abs($time - $eventTime) > 0.2 ){
-					### $time - $eventTime got: $time - $eventTime
-					$eventTime = $time;
-					SendKeys($eventString[0]);
-					### @eventString
-				}# if enough time has passed
-				@eventString = ("default");
-			}#if non default event
+	#if ($movingWindow ne 1) {
+	if($oneTimeCombination ne 1) {
+		if($onetime) {
+			$oneTimeCombination = 1;
 		}
+		if( $eventString[0] ne "default"){
+			### ne default
+			if( abs($time - $eventTime) > 0.2 ){
+				### $time - $eventTime got: $time - $eventTime
+				$eventTime = $time;
+				SendKeys($eventString[0]);
+				### @eventString
+			}# if enough time has passed
+			@eventString = ("default");
+		}#if non default event
 	}
+	#}
 }#synclient line in
 close(INFILE);
 
@@ -447,8 +453,26 @@ sub cleanHist{
 }
 
 #return @eventString $_[0]
+sub setEventStringMoving{
+	my($f, $axis, $rate, $touchState, $click, $speed)=@_;
+	if($f == 3) {
+		if($axis eq "x"){
+			return "default";
+		} elsif($axis eq "y") {
+			if($rate eq "+"){
+				return @swipe3DownMoving;
+			}elsif($rate eq "-"){
+				return @swipe3UpMoving;
+			}
+		} elsif($axis eq "z") {
+			return "default";
+		}
+	}
+
+	return "default";
+}
 sub setEventString{
-	my($f, $axis, $rate, $touchState, $click)=@_;
+	my($f, $axis, $rate, $touchState, $click, $speed)=@_;
 	if($f == 1){
 		if($axis eq "x"){
 			if($rate eq "+"){

@@ -1,0 +1,115 @@
+{
+	:timeTolerance 		=> 0.10,	#Minimum time of swiping for triggering a swipe action
+	:repTime		=> 0.25,	#Time needed to repeat a swiping action
+	:magnitudeTolerance	=> 20,		#Minimum speed of swiping in order to trigger a swipe action
+	:pollingInterval 	=> 30,		#Polling interval of synclient
+	:angleTolerance	 	=> 20,		#How much can the movement angle differ from the target angle (in degrees)
+
+	#Normal swipe actions
+	:swipe => {
+		#Two fingers swiping
+		2 => { 
+		},
+
+		#Three fingers swiping
+		3 => {
+			:right  =>  	{
+						:action => "%({LEF})",		#Action: history back on browsers
+					},
+
+			:left	=>  	{
+						:action => "%({RIG})",		#Action: history forward on browsers
+					},
+
+			:down	=>  	{
+						:action => "^(%({UP}))",	#Action: Switch to upper desktop
+					},
+
+			:up	=>  	{
+						:action => "^(%({DOWN})",	#Action: Switch to lower desktop
+					},
+		},
+
+		#Four fingers swiping
+		4 => {
+			:right	=>  	{
+						:action => "{XF86AudioPrev}",	#Action: previous song
+					},
+
+			:left	=>  	{
+						:action => "{XF86AudioNext}",	#Action: next song
+					},
+
+			:down	=>  	{
+						:action => "^(%(+(w)))",	#Action: Show all windows in the system
+						:onetime => true,			#Won't be executed multiple times
+					},
+
+			:up	=>  	{
+						:action => "^(%(w))",		#Action: Show all windows in the current desktop
+						:onetime => true,			#Won't be executed multiple times
+					},
+		},
+
+		#Five fingers swiping
+		5 => {
+		},
+
+	},
+
+	#Swipe actions from the edges
+	:edgeSwipe => {
+		#One finger edge swipe
+		1 => {
+			:left	=>  	{
+						:action 	=> "{LSK}",			#Action: Open system menu
+						:magnitude 	=> 60,				#Minimum speed modified
+						:onetime 	=> true,			#Won't be executed multiple times
+					},
+
+			:right	=>  	{
+						:action 	=> "^(%(+(s)))",
+						:magnitude 	=> 60,
+						:onetime 	=> true,
+					},
+		},
+
+		#Two fingers edge swipe
+		2 => {
+			:right	=>  	{
+						:action => "{XF86AudioRaiseVolume}",	#Action: Raise volume
+					},
+
+			:left	=>  	{
+						:action => "{XF86AudioLowerVolume}",	#Action: Lower volume
+					},
+		},
+
+		#Three fingers edge swipe
+		3 => {
+		},
+
+		#Four fingers edge swipe
+		4 => {
+		},
+
+		#Five fingers edge swipe
+		5 => {
+		},
+	},
+
+	:move => {
+		:fingers => "5",
+		:key	=> "LAL",
+
+		:swipe =>{
+			:up   =>  "^(%(+({DOWN})))",
+			:down =>  "^(%(+({UP})))",
+		},
+	},
+
+	:pinch => {
+		:in		=> "^{+}",
+		:out	=> "^{-}",
+	},
+}
