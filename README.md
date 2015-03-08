@@ -9,7 +9,7 @@ Before running the script, you must first do some preparations.
 
   1. Install git
   2. Download xSwipe
-  3. Install X11::GUITest
+  3. Install required packages
   4. Enable SHMConfig
   5. Install xserver-xorg-input-synaptic
 
@@ -24,12 +24,11 @@ Type below code, download xSwipe from github
     $ cd YourInstallationFolder
     $ git clone https://github.com/intersimone999/xSwipe.git
 
-### 3. Install X11::GUITest
+### 3. Install required packages
 
-To install libx11-guitest-perl from synaptic package manager
-Or run the script on the terminal run as
+You have to install Ruby and X11::GUITest for Perl. Run the following command:
 
-    $ sudo apt-get install libx11-guitest-perl
+    $ sudo apt-get install ruby libx11-guitest-perl
 
 ### 4. Enable SHMConfig
 
@@ -87,41 +86,37 @@ and restart your session.
 
 To run xSwipe, type below code on terminal.
 
-    $ perl ~/xSwipe-master/xSwipe.pl -n
-
-**Note:You should run xSwipe.pl in same directory as "eventKey.cfg" .**
-**Note:Always use the "-n" option, because this version of the project supports only natural scroll**
+    $ ruby ~/xSwipe-master/rubySwipe.rb -r -d
 
 You can use "swipe" with 3 or 4 fingers, they can call an event.
 Additionally, some gestures are avilable.
 
 * *edge-swipe* : swipe with 2 fingers from outside edge.
 * *long-press* : hold pressure for 0.5 seconds with 3 or 4 fingers.
+* *movement* : tap with 5 fingers and release four of them. You can move the window you clicked on. Just release the last finger to stop. You can also use 3 fingers swiping to move the window to another workspace
 
 ### Option
 
-*   `-d RATE` :
-      *RATE* is sensitivity to swipe.Default value is 1.
-      Shorten swipe-length by half (e.g.,`$ perl xSwipe.pl -d 0.5`)
-*   `-m INTERVAL` :
-      *INTERVAL* is how often synclient monitor changes to the touchpad state.
-      Default value is 10(ms).
-      Set 50ms as monitoring-span. (e.g.,`$ perl xSwipe.pl -m 50`)
+*   `-d` :
+      *DAEMON* run "syndaemon". Use only the first time you run the script in each session.
+*   `-r` :
+      *RUN* run the script. If you don't use this flag, the script won't start. It is useful if you import it in another application or you just want to test it using irb.
 
 ### Bindable gestures
+* 1 finger edge-swipe
 * 3/4/5 fingers swipe
-* 2/3/4/5 fingers long-press
 * 2/3/4 fingers edge-swipe
     - *2fingers edge-swipe*: only swipe-left/right from right/left edge
     - *3/4/5fingers edge-swipe*: only swipe-down from top egde
-
-### Coming soon
 * Move gesture
-* 1 finger edge-swipe
-* Pinch gestures
+    - *Number of fingers*: number of fingers needed to start moving a window
+    - *Move key*: the key to be used in order to move a window. See compiz configuration.
+    - *Swipe actions*: how to deal with swipe gestures when moving a window
 
 ### Default gestures
-
+* 1 Finger
+  * Left (edge) -> disabled
+  * Right (edge) -> disabled
 * 2 Fingers
   * Left (edge) -> Lower volume (Special key)
   * Right (edge) -> Raise volume (Special key)
@@ -131,17 +126,19 @@ Additionally, some gestures are avilable.
   * Left -> History forward (Alt+Right)
   * Right -> History back (Alt+Left)
 * 4 Fingers
-  * Up -> Show all windows on desktop (Edited compiz combination: Ctrl+Alt+w)
-  * Down -> Show all windows in the system (Edited compiz combination: Ctrl+Alt+Shift+w)
+  * Up -> Show all windows on desktop (modified compiz combination: Ctrl+Alt+w)
+  * Down -> Show all windows in the system (modified compiz combination: Ctrl+Alt+Shift+w)
   * Left -> Previous song (Special key)
   * Right -> Next song (Special key)
 * 5 Fingers
-  * Up -> Move window to lower desktop (Ctrl+Alt+Shift+Down)
-  * Down -> Move window to upper desktop (Ctrl+Alt+Shift+Up)
+  * All disabled (used to move)
+* Move gesture
+  * Fingers -> 5
+  * Key -> ALT
 
 # Configuration file customization
 
-In order to change the action of a gesture, find the gesture in "eventKey.cfg" and set the corresponding double-quoted string. You can use the following modifiers:
+In order to change the action of a gesture, find the gesture in "eventKey.cfgr" and set the corresponding double-quoted string. You can use the following modifiers:
 
     ^       CTRL
     %       ALT
@@ -200,19 +197,21 @@ These are all the special keys:
     UP      Up
 
 To find special keys, use xev.
-For example: 
 
-    'session'=>{
+This is an example: 
+
+    :swipe=>{
       [...]
-      swipe3=>{
+      3=>{
         [...]
-        left    =>  "%({RIG})", #Triggered if there is a 3-fingers swipe towards left
+        :left    =>  "%({RIG})", #Triggered if there is a 3-fingers swipe towards left
         [...]
       }
       [...]
-      edgeSwipe2=>{
+    :edgeSwipe
+      2 =>{
         [...]
-        right	=>   "{LSK}", #Triggered if there is a 1-finger swipe from the left edge towards right
+        :right	=>   "{LSK}", #Triggered if there is a 2-finger swipe from the left edge towards right
         [...]
       },
       [...]
