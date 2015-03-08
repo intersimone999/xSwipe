@@ -28,13 +28,17 @@ class MainController
 		angle = @input_interpreter.direction.angle
 		
 		if angle <= @angle_tolerance || angle >= 360-@angle_tolerance
-			return swipe fingers, :right
+			edge = @input_interpreter.edge.include? InputHandler::EDGE_LEFT
+			return swipe fingers, :right, edge
 		elsif angle.between?(90-@angle_tolerance, 90+@angle_tolerance)
-			return swipe fingers, :down
+			edge = @input_interpreter.edge.include? InputHandler::EDGE_TOP
+			return swipe fingers, :down, edge
 		elsif angle.between?(180-@angle_tolerance, 180+@angle_tolerance)
-			return swipe fingers, :left
+			edge = @input_interpreter.edge.include? InputHandler::EDGE_RIGHT
+			return swipe fingers, :left, edge
 		elsif angle.between?(270-@angle_tolerance, 270+@angle_tolerance)
-			return swipe fingers, :up
+			edge = @input_interpreter.edge.include? InputHandler::EDGE_BOTTOM
+			return swipe fingers, :up, edge
 		end
 	end
 
@@ -60,11 +64,11 @@ class MainController
 		@action.sendKeys(@config.get(:pinch, :out))
 	end
 
-	def swipe(fingers, direction)
+	def swipe(fingers, direction, edge)
 		action, magnitude, onetime = nil
 
 		if !@is_moving
-			folder = (@input_interpreter.edge? ? :edgeSwipe : :swipe)
+			folder = (edge ? :edgeSwipe : :swipe)
 			action, magnitude, onetime = *get_swipe_data(folder, fingers, direction)
 		else
 			action, magnitude, onetime = *get_swipe_data(:move, :swipe, fingers, direction)

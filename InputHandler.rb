@@ -1,4 +1,9 @@
 class InputHandler
+	EDGE_LEFT 	= 0
+	EDGE_RIGHT	= 1
+	EDGE_TOP	= 2
+	EDGE_BOTTOM	= 3
+
 	attr_reader		:direction
 	attr_reader		:position
 
@@ -26,7 +31,7 @@ class InputHandler
 	def reset
 		@current_repetition_time = @time_tolerance
 		@can_be_triggered = true
-		@is_edge = false
+		@edge = nil
 		@swipe_start = nil
 		@pinch_start = nil
 		@fingers = 0
@@ -36,7 +41,11 @@ class InputHandler
 	end
 
 	def edge?
-		return @is_edge
+		return @edge != nil
+	end
+
+	def edge
+		return @edge
 	end
 	
 	def moving?
@@ -69,22 +78,23 @@ class InputHandler
 			#Prints debug information
 			#p @direction if $debug
 
-			#If no gesture is currently performing, starts a gesture recording
+			#If no gesture is currently starts, performing a gesture recording
 			if not swiping?
 				@swipe_start = time
 				@pinch_start = time
-				@is_edge = true if @position.x < @input.left_edge || @position.x > @input.right_edge
+				@edge = calc_edge(x, y)
 				@fingers = fingers
-				p @fingers, @is_edge, @position if $debug
 			end
 
 			#If the number of fingers change, resets the recording
 			if @fingers != fingers
+				old_edge = @edge
 				reset
+				@edge = old_edge
 
-				@is_edge = true if @position.x < @input.left_edge || @position.x > @input.right_edge
 				@fingers = fingers
 				@swipe_start = time
+				p @fingers, @edge, @position if $debug
 			end
 
 			#Pinch recognition not working
@@ -116,5 +126,14 @@ class InputHandler
 				@can_be_triggered = !responder.onSwipe(@fingers)
 			end
 		end
+	end
+
+	def calc_edge(x, y)
+		result = []
+		result.push EDGE_LEFT 	if x < @input.left_edge
+		result.push EDGE_RIGHT	if x > @input.right_edge
+		result.push EDGE_TOP	if y < @input.top_edge
+		result.push EDGE_BOTTOM	if y > @input.bottom_edge
+		return result
 	end
 end

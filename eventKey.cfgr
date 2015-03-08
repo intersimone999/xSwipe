@@ -76,19 +76,19 @@
 
 		#Three fingers edge swipe
 		3 => {
-			:left	=>  	{
-						:action 	=> "{LSK}",			#Action: Open system menu
-						:onetime 	=> true,			#Won't be executed multiple times
-					},
-
-			:right	=>  	{
-						:action 	=> "^(%(+(s)))",		#Action: Open expo
-						:onetime 	=> true,			#Won't be executed multiple times
-					},
 		},
 
 		#Four fingers edge swipe
 		4 => {
+			:up	=>  	{
+						:action 	=> "{LSK}",			#Action: Open system menu
+						:onetime 	=> true,			#Won't be executed multiple times
+					},
+
+			:down	=>  	{
+						:action 	=> "^(%(+(s)))",		#Action: Open expo
+						:onetime 	=> true,			#Won't be executed multiple times
+					},
 		},
 
 		#Five fingers edge swipe
