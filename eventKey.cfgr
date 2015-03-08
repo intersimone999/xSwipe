@@ -61,17 +61,6 @@
 	:edgeSwipe => {
 		#One finger edge swipe
 		1 => {
-			:left	=>  	{
-						:action 	=> "{LSK}",			#Action: Open system menu
-						:magnitude 	=> 60,				#Minimum speed modified
-						:onetime 	=> true,			#Won't be executed multiple times
-					},
-
-			:right	=>  	{
-						:action 	=> "^(%(+(s)))",
-						:magnitude 	=> 60,
-						:onetime 	=> true,
-					},
 		},
 
 		#Two fingers edge swipe
@@ -87,6 +76,15 @@
 
 		#Three fingers edge swipe
 		3 => {
+			:left	=>  	{
+						:action 	=> "{LSK}",			#Action: Open system menu
+						:onetime 	=> true,			#Won't be executed multiple times
+					},
+
+			:right	=>  	{
+						:action 	=> "^(%(+(s)))",		#Action: Open expo
+						:onetime 	=> true,			#Won't be executed multiple times
+					},
 		},
 
 		#Four fingers edge swipe
@@ -99,17 +97,23 @@
 	},
 
 	:move => {
-		:fingers => "5",
+		:fingers => 5,
 		:key	=> "LAL",
 
-		:swipe =>{
-			:up   =>  "^(%(+({DOWN})))",
-			:down =>  "^(%(+({UP})))",
+		:swipe => {
+			3 => {
+				:up   =>  	{
+							:action => "^(%(+({DOWN})))",
+						},
+				:down =>  	{
+							:action => "^(%(+({UP})))",
+						},
+			},
 		},
 	},
 
 	:pinch => {
-		:in		=> "^{+}",
+		:in	=> "^{+}",
 		:out	=> "^{-}",
 	},
 }

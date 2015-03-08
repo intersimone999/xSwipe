@@ -20,5 +20,21 @@ while (<>) {
 		PressKey($action);
 	} elsif ($kind eq "ReleaseKey") {
 		ReleaseKey($action);
+	} elsif ($kind eq "PressMouseButton") {
+		if ($action eq "MLEFT") {
+			PressMouseButton(M_LEFT);
+		} elsif ($action eq "MRIGHT") {
+			PressMouseButton(M_RIGHT);
+		} elsif ($action eq "MCENTER") {
+			PressMouseButton(M_MIDDLE);
+		}
+	} elsif ($kind eq "ReleaseMouseButton") {
+		if ($action eq "MLEFT") {
+			ReleaseMouseButton(M_LEFT);
+		} elsif ($action eq "MRIGHT") {
+			ReleaseMouseButton(M_RIGHT);
+		} elsif ($action eq "MCENTER") {
+			ReleaseMouseButton(M_MIDDLE);
+		}
 	}
 }
