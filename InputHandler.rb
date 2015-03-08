@@ -75,12 +75,14 @@ class InputHandler
 				@pinch_start = time
 				@is_edge = true if @position.x < @input.left_edge || @position.x > @input.right_edge
 				@fingers = fingers
+				p @fingers, @is_edge, @position if $debug
 			end
 
 			#If the number of fingers change, resets the recording
 			if @fingers != fingers
 				reset
 
+				@is_edge = true if @position.x < @input.left_edge || @position.x > @input.right_edge
 				@fingers = fingers
 				@swipe_start = time
 			end
