@@ -23,7 +23,7 @@ my $nScrollConfFileName = "nScroll/eventKey.cfg";
 while(my $ARGV = shift){
     ### $ARGV
     if ($ARGV eq '-n'){
-		print "Deprecated -n option. The script is working, but you don't have to add that option, it's always on."
+		print "Deprecated -n option. The script is working, but you don't have to add that option, it's always on.";
         $naturalScroll = 1;
     }elsif ($ARGV eq '-d'){
         if ($ARGV[0] > 0){
