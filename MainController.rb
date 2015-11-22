@@ -15,7 +15,7 @@ class MainController
 
 		@action = ActionHandler.new
 		
-		@controller = InputController.new runDaemon
+		@controller = InputController.new runDaemon, @config.get(:inputDevice)
 		@input_interpreter = InputHandler.new @controller
 		@input_interpreter.time_tolerance = @time_tolerance
 		@input_interpreter.magnitude_tolerance = @magnitude_tolerance

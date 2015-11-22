@@ -9,7 +9,7 @@ class InputController
 	attr_reader		:top_edge
 	attr_reader		:bottom_edge
 
-	def initialize(runDaemon)
+	def initialize(runDaemon, event_id)
 		#system("syndaemon -m 30 -i 0.5 -K -t -d &") if runDaemon
 
 		data = CommandLine.execute("synclient -l | grep ScrollDelta | grep -v -e Circ").split("\n")
@@ -31,6 +31,8 @@ class InputController
 		@touchpad_width = (@left_edge-@right_edge).abs
 
 		@touchpad_center = Vector.new(@left_edge + @touchpad_width/2, @top_edge + @touchpad_height/2)
+                
+                @event_id = event_id
 	end
 
 	# Main method. To use as a iterator, yields time, x, y, z, fingers and click
@@ -61,26 +63,26 @@ class InputController
 	# Main method. To use as a iterator, yields time, x, y, z, fingers and click
 	def poll(interval)
 		parser = InputParser.new
-		
 		Thread.start do
-			loop do
-				Open3.popen3("evemu-record /dev/input/event14") do |stdin, stdout, stderr|
-					start_time = Time.now
-					current_time = Time.now
-					while (line=stdout.gets)
-						begin
-							sync = parser.parse(line)
-							
-							#If enough time passed and the parser synched, re-open the stream
-							break if sync && (current_time - start_time > 5)
-						rescue
-							p $!
-							p $!.backtrace
-						end
-						current_time = Time.now
-					end
-				end
-			end
+                    loop do
+                        name = "evemu-record /dev/input/event#@event_id"
+                        Open3.popen3(name) do |stdin, stdout, stderr|
+                                start_time = Time.now
+                                current_time = Time.now
+                                while (line=stdout.gets)
+                                    begin
+                                        sync = parser.parse(line)
+                                        
+                                        #If enough time passed and the parser synched, re-open the stream
+                                        break if sync && (current_time - start_time > 5)
+                                    rescue
+                                        p $!
+                                        p $!.backtrace
+                                    end
+                                    current_time = Time.now
+                                end
+                        end
+                    end
 		end
 		
 		loop do

@@ -1,4 +1,5 @@
 {
+        :inputDevice            => 14,          #Synaptics device ID (/dev/input/eventXX)
         :debug                  => false,       #Sets the debug option
 	:timeTolerance 		=> 0.10,	#Minimum time of swiping for triggering a swipe action
 	:repTime		=> 0.20,	#Time needed to repeat a swiping action
