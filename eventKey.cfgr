@@ -1,0 +1,136 @@
+{
+        :debug                  => false,       #Sets the debug option
+	:timeTolerance 		=> 0.10,	#Minimum time of swiping for triggering a swipe action
+	:repTime		=> 0.20,	#Time needed to repeat a swiping action
+	:magnitudeTolerance	=> 10,		#Minimum speed of swiping in order to trigger a swipe action
+	:pollingInterval 	=> 10,		#Polling interval of synclient
+	:angleTolerance	 	=> 20,		#How much can the movement angle differ from the target angle (in degrees)
+
+	#Normal swipe actions
+	:swipe => {
+		#Two fingers swiping
+		2 => { 
+		},
+
+		#Three fingers swiping
+		3 => {
+			:right  =>  	{
+						:action => "%({LEF})",		#Action: history back on browsers
+					},
+
+			:left	=>  	{
+						:action => "%({RIG})",		#Action: history forward on browsers
+					},
+
+			:down	=>  	{
+						:action => "^(%({UP}))",	#Action: Switch to upper desktop
+					},
+
+			:up	=>  	{
+						:action => "^(%({DOWN})",	#Action: Switch to lower desktop
+					},
+		},
+
+		#Four fingers swiping
+		4 => {
+			:right	=>  	{
+						:action => "{XF86AudioPrev}",	#Action: previous song
+					},
+
+			:left	=>  	{
+						:action => "{XF86AudioNext}",	#Action: next song
+					},
+
+			:down	=>  	{
+						:action => "%({F1})",	#Action: Show all windows in the system
+						:onetime => true,			#Won't be executed multiple times
+					},
+
+			:up	=>  	{
+						:action => "^({F9})",		#Action: Show all windows in the current desktop
+						:onetime => true,			#Won't be executed multiple times
+					},
+		},
+
+		#Five fingers swiping
+		5 => {
+		},
+
+	},
+
+	#Swipe actions from the edges
+	:edgeSwipe => {
+		#One finger edge swipe
+		1 => {
+		},
+
+		#Two fingers edge swipe
+		2 => {
+			:right	=>  	{
+						:action => "{XF86AudioRaiseVolume}",	#Action: Raise volume
+					},
+
+			:left	=>  	{
+						:action => "{XF86AudioLowerVolume}",	#Action: Lower volume
+					},
+		},
+
+		#Three fingers edge swipe
+		3 => {
+			:down 	=>	{
+						:action 	=> "{F12}",		#Action: show guake terminal
+						:onetime	=> true,		#Won't be executed multiple times
+					},
+		},
+
+		#Four fingers edge swipe
+		4 => {
+			:up	=>  	{
+						:action 	=> "{F11}",			#Action: Fullscreen (where available)
+						:onetime 	=> true,			#Won't be executed multiple times
+					},
+
+			:down	=>  	{
+						:action 	=> "^({F8})",		#Action: Open expo
+						:onetime 	=> true,			#Won't be executed multiple times
+					},
+		},
+
+		#Five fingers edge swipe
+		5 => {
+		},
+	},
+
+	:move => {
+		:fingers => 5,
+		:key	=> "LAL",
+
+		:swipe => {
+			2 => {
+				:down => {
+					:action	=> "%({F4})",
+					:hold	=> false,
+				},
+				
+				:left => {
+					:action	=> "%({SPC})",					#Action: Minimizes the window
+					:hold 	=> false,
+				}
+			},
+
+			3 => {
+				:up   =>  	{
+							:action => "^(%(+({DOWN})))",
+						},
+				:down =>  	{
+							:action => "^(%(+({UP})))",
+						},
+			},
+		},
+	},
+
+	:pinch => {
+		:in	=> "^{+}",
+		:out	=> "^{-}",
+	},
+}
