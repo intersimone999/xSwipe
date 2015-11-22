@@ -2,8 +2,11 @@
 class MainController
 	def main(runDaemon=false)
 		@config = ConfigHandler.new
+                
+                $DEBUG = @config.get :debug
+                
 		@time_tolerance 		= @config.get :timeTolerance
-		@magnitude_tolerance 	= @config.get :magnitudeTolerance
+		@magnitude_tolerance      	= @config.get :magnitudeTolerance
 		@angle_tolerance 		= @config.get :angleTolerance
 		@polling_interval		= @config.get :pollingInterval
 		@repetition_time		= @config.get :repTime
@@ -21,6 +24,7 @@ class MainController
 		@input_interpreter.polling_interval = @polling_interval
 		@input_interpreter.move_fingers = @move_fingers
 		
+                @input_interpreter.reset
 		@input_interpreter.mainloop self
 	end
 
@@ -65,18 +69,26 @@ class MainController
 	end
 
 	def swipe(fingers, direction, edge)
-		action, magnitude, onetime = nil
+		action, magnitude, onetime, hold = nil
 
 		if !@is_moving
 			folder = (edge ? :edgeSwipe : :swipe)
 			action, magnitude, onetime = *get_swipe_data(folder, fingers, direction)
+                        
+                        @action.sendKeys(action) if check_magnitude magnitude
 		else
-			action, magnitude, onetime = *get_swipe_data(:move, :swipe, fingers, direction)
+			action, hold, onetime = *get_move_swipe_data(:move, :swipe, fingers, direction)
+                        
+                        self.onEndMoving
+                        @action.sendKeys(action) if check_magnitude magnitude
+                        self.onStartMoving
+                        
+			pdebug hold
+			self.onEndMoving unless hold
+			magnitude = 0
 		end
 		
 		debug "Simulating #{action}"
-
-		@action.sendKeys(action) if check_magnitude magnitude
 
 		return onetime
 	end
@@ -93,6 +105,21 @@ class MainController
 		onetime = false if onetime == "default"
 
 		return action, magnitude, onetime
+	end
+
+	def get_move_swipe_data(*path)
+		debug "Getting #{path.join(', ')}"
+		acp = path + [:action]
+		hlp = path + [:hold]
+		otp = path + [:onetime]
+
+		pdebug action = @config.get(*acp)
+		pdebug hold = @config.get(*hlp)
+		onetime = @config.get(*otp)
+		onetime = false if onetime == "default"
+		hold = true if hold == "default"
+
+		return action, hold, onetime
 	end
 
 	def check_magnitude(magnitude)

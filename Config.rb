@@ -15,7 +15,7 @@ class ConfigHandler
 			return "default" unless current
 			current = current[key]
 		end
-		return "default" unless current
+		return "default" if current == nil
 		return current
 	end
 

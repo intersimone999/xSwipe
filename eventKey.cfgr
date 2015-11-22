@@ -1,8 +1,9 @@
 {
+        :debug                  => false,       #Sets the debug option
 	:timeTolerance 		=> 0.10,	#Minimum time of swiping for triggering a swipe action
-	:repTime		=> 0.25,	#Time needed to repeat a swiping action
-	:magnitudeTolerance	=> 20,		#Minimum speed of swiping in order to trigger a swipe action
-	:pollingInterval 	=> 30,		#Polling interval of synclient
+	:repTime		=> 0.20,	#Time needed to repeat a swiping action
+	:magnitudeTolerance	=> 10,		#Minimum speed of swiping in order to trigger a swipe action
+	:pollingInterval 	=> 10,		#Polling interval of synclient
 	:angleTolerance	 	=> 20,		#How much can the movement angle differ from the target angle (in degrees)
 
 	#Normal swipe actions
@@ -41,12 +42,12 @@
 					},
 
 			:down	=>  	{
-						:action => "^(%(+(w)))",	#Action: Show all windows in the system
+						:action => "%({F1})",	#Action: Show all windows in the system
 						:onetime => true,			#Won't be executed multiple times
 					},
 
 			:up	=>  	{
-						:action => "^(%(w))",		#Action: Show all windows in the current desktop
+						:action => "^({F9})",		#Action: Show all windows in the current desktop
 						:onetime => true,			#Won't be executed multiple times
 					},
 		},
@@ -76,17 +77,21 @@
 
 		#Three fingers edge swipe
 		3 => {
+			:down 	=>	{
+						:action 	=> "{F12}",		#Action: show guake terminal
+						:onetime	=> true,		#Won't be executed multiple times
+					},
 		},
 
 		#Four fingers edge swipe
 		4 => {
 			:up	=>  	{
-						:action 	=> "{LSK}",			#Action: Open system menu
+						:action 	=> "{F11}",			#Action: Fullscreen (where available)
 						:onetime 	=> true,			#Won't be executed multiple times
 					},
 
 			:down	=>  	{
-						:action 	=> "^(%(+(s)))",		#Action: Open expo
+						:action 	=> "^({F8})",		#Action: Open expo
 						:onetime 	=> true,			#Won't be executed multiple times
 					},
 		},
@@ -102,9 +107,15 @@
 
 		:swipe => {
 			2 => {
-				:left => {
-					:action	=> "^(w)",
+				:down => {
+					:action	=> "%({F4})",
+					:hold	=> false,
 				},
+				
+				:left => {
+					:action	=> "%({SPC})",					#Action: Minimizes the window
+					:hold 	=> false,
+				}
 			},
 
 			3 => {

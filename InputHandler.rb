@@ -56,9 +56,16 @@ class InputHandler
 		return @swipe_start != nil
 	end
 
-	def mainloop(responder)
-		@input.poll @polling_interval do |time, x, y, z, fingers, click|
-			if fingers == 0
+    def mainloop(responder)
+		@input.poll @polling_interval do |event|
+            time = event.time
+            x = event.x
+            y = event.y
+            z = event.z
+            fingers = event.fingers
+            click = event.click
+            
+            if fingers == 0
 				if @is_moving
 					responder.onEndMoving
 					@is_moving = false
