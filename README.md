@@ -11,13 +11,18 @@ Before running the script, you must first do some preparations.
   2. Download xSwipe
   3. Install required packages
 
-Note: this guide is designed for Debian derivates and Arch Linux.
+***NOTE***: this guide is designed for Debian derivates and Arch Linux.
 
 ### 1. Install git
 Type below code to download git:
 
+**Debian**
+
     $ sudo apt-get install git
     
+**Arch Linux**
+
+    $ sudo pacman -S git
 
 ### 2. Download xSwipe
 Type below code, download xSwipe from github
@@ -29,14 +34,21 @@ Type below code, download xSwipe from github
 
 You have to install Ruby and X11::GUITest for Perl. Run the following command:
 
-    $ sudo apt-get install ruby libx11-guitest-perl evemu
+**Debian**
 
+    $ sudo apt-get install ruby libx11-guitest-perl evemu-tools
+
+**Arch Linux**
+
+    $ yaourt -S ruby perl lib perl-x11-guitest evemu
 
 ## Run xSwipe
 
 To run xSwipe, type below code on terminal.
 
-    $ ruby ~/xSwipe-master/rubySwipe.rb -r
+    $ sudo ruby ~/xSwipe-master/rubySwipe.rb -r
+
+Note that xSwipe requires root privileges in order to use evemu-record.
 
 You can use "swipe" with 3 or 4 fingers, they can call an event.
 Additionally, some gestures are avilable.
